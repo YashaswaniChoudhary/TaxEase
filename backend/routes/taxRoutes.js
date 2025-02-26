@@ -32,6 +32,8 @@ const calculateTax = (income) => {
 
 // API Endpoint: POST /api/tax/calculate
 router.post("/calculate", (req, res) => {
+    
+    console.log("Request received:", req.body);
     try {
         const { income } = req.body;
 

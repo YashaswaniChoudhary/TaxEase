@@ -8,7 +8,7 @@ const App = () => {
 
     const calculateTax = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/calculate', { income });
+            const response = await axios.post('http://localhost:5000/api/tax/calculate', { income });
             setTax(response.data.tax);
         } catch (error) {
             console.error('Error calculating tax:', error);
