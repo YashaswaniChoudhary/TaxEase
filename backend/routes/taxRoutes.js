@@ -30,11 +30,6 @@ const calculateTax = (income) => {
     return tax;
 };
 
-// Example Usage
-console.log("Tax Payable for ₹10,00,000:", calculateTax(1000000)); // Should return 0
-console.log("Tax Payable for ₹15,00,000:", calculateTax(1500000)); // Should return 90,000
-console.log("Tax Payable for ₹20,00,000:", calculateTax(2000000)); // Should return correctly computed tax
-
 // API Endpoint: POST /api/tax/calculate
 router.post("/calculate", (req, res) => {
     try {
