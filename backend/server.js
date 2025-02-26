@@ -12,6 +12,9 @@ const MONGO_URI = process.env.MONGO_URI;
 app.use(cors());
 app.use(express.json());
 
+const taxRoutes = require("./routes/taxRoutes");
+app.use("/api/tax", taxRoutes);
+
 mongoose
   .connect(MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
