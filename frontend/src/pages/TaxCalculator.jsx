@@ -9,7 +9,8 @@ const TaxCalculator = () => {
     setError(""); // Clear any previous error
     setTax(null); // Reset tax
 
-    if (!income || isNaN(income) || income < 0) {
+    const numericIncome = parseFloat(income); // Convert input to a number
+    if (isNaN(numericIncome) || numericIncome <= 0) {
       setError("Please enter a valid income amount.");
       return;
     }
@@ -17,21 +18,20 @@ const TaxCalculator = () => {
     try {
       const response = await fetch("http://localhost:5000/api/tax/calculate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ income: Number(income) }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ income: numericIncome }), // Ensure it's a valid number
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        setTax(data.taxPayable);
-      } else {
-        setError(data.message || "Error calculating tax.");
+      if (!response.ok) {
+        throw new Error(data.message || "Error calculating tax.");
       }
+
+      // Ensure we're using the correct field from the response
+      setTax(data.tax || data.totalTax || "N/A");
     } catch (err) {
-      setError("Server error. Please try again later.");
+      setError(err.message || "Server error. Please try again later.");
     }
   };
 

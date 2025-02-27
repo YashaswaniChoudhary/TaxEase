@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import App from "./App";
-import { ThemeProvider, CssBaseline } from "@mui/material";
-import theme from "./theme";
+import theme from "./theme"; // Ensure theme.js is correctly configured
 
-const Main = () => {
-  const [mode, setMode] = useState("light");
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-  return (
-    <ThemeProvider theme={theme(mode)}>
-      <CssBaseline /> {/* Ensures consistent background & typography */}
-      <App mode={mode} setMode={setMode} />
+root.render(
+  <React.StrictMode>
+    <ThemeProvider theme={theme("light")}> {/* Default theme */}
+      <CssBaseline /> {/* Ensures proper global styling */}
+      <App />
     </ThemeProvider>
-  );
-};
-
-ReactDOM.createRoot(document.getElementById("root")).render(<Main />);
+  </React.StrictMode>
+);
