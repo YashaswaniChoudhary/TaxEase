@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 router.post("/calculate", (req, res) => {
-    let { income, investments80C, rentPaid, basicSalary, cityType } = req.body;
+    let { income, investments80C, rentPaid, basicSalary, cityType, incomeType } = req.body;
 
     // Convert values to numbers
     income = Number(income) || 0;
@@ -13,13 +13,23 @@ router.post("/calculate", (req, res) => {
     if (income <= 0) {
         return res.status(400).json({ error: "Invalid income input" });
     }
-
+    
+    console.log("Initial Income:", income);
     let taxableIncome = income;
 
     // Section 80C Deduction (Max ₹1,50,000)
     const max80CDeduction = 150000;
     const deduction80C = Math.min(investments80C, max80CDeduction);
     taxableIncome -= deduction80C;
+    console.log("After 80C Deduction:", taxableIncome);
+
+    // Apply Standard Deduction (₹50,000) for salaried individuals and pensioners
+    let standardDeduction = 0;
+    if (incomeType === "salaried" || incomeType === "pensioner") {
+        standardDeduction = 50000;
+        taxableIncome -= standardDeduction;
+        console.log("After Standard Deduction:", taxableIncome);
+    }
 
     // HRA Exemption Calculation
     let hraExemption = 0;
@@ -28,10 +38,12 @@ router.post("/calculate", (req, res) => {
         const metroHRA = cityType === "metro" ? 0.5 * basicSalary : 0.4 * basicSalary;
         hraExemption = Math.max(0, Math.min(rentMinus10PercentSalary, metroHRA));
         taxableIncome -= hraExemption;
+        console.log("After HRA Exemption:", taxableIncome);
     }
 
     // Ensure taxable income is not negative
     taxableIncome = Math.max(0, taxableIncome);
+    console.log("Final Taxable Income:", taxableIncome);
 
     // Tax slabs as per the new tax regime
     const slabs = [
@@ -62,14 +74,16 @@ router.post("/calculate", (req, res) => {
             previousLimit = slab.limit;
         }
     });
+    console.log("Total Tax Before Rebate:", tax);
 
     // Apply ₹60,000 rebate
     const rebateAmount = 60000;
     tax = Math.max(tax - rebateAmount, 0);
+    console.log("Total Tax After Rebate:", tax);
 
     res.json({
         income: `₹${income.toLocaleString()}`,
-        totalTax: `₹${tax.toFixed(2)}`,
+        totalTax: tax.toFixed(2),
         rebateApplied: `₹${rebateAmount.toFixed(2)}`,
         deductions: {
             section80C: `₹${deduction80C.toLocaleString()}`,
